@@ -11,29 +11,35 @@ document.body.style.margin = "0";
 app.innerHTML = `
   <div style="position:fixed; inset:0; display:flex; flex-direction:column;">
     <div style="padding:10px; display:flex; gap:8px; align-items:center; background:#fff; border-bottom:1px solid #ddd;">
-      <button id="toothPrev">«</button>
-      <label style="font-family:system-ui;">Dente (FDI):</label>
-      <select id="tooth"></select>
-      <button id="toothNext">»</button>
-
-      <label style="font-family:system-ui;">Variação:</label>
-      <select id="var"></select>
-
-      <button id="prev">◀</button>
-      <button id="next">▶</button>
-      <button id="reset">Reset</button>
-      <button id="rotate">Auto</button>
-
-      <div id="barWrap" style="width:140px; height:8px; background:#eee; border-radius:999px; overflow:hidden;">
-        <div id="bar" style="height:100%; width:0%; background:#4a90e2;"></div>
-      </div>
-      <span id="pct" style="font-family:system-ui; font-size:12px; width:42px; text-align:right;">0%</span>
-
-      <span id="status" style="margin-left:auto; font-family:system-ui; font-size:12px;"></span>
+      ...
     </div>
+
     <div id="view" style="flex:1; min-height:0;"></div>
+
+    <!-- Marca d’água FIXA (sempre visível) -->
+    <div id="watermark"
+         style="
+           position:fixed;
+           right:12px;
+           bottom:10px;
+           z-index:9999;
+           pointer-events:none;
+           font-family:system-ui;
+           font-size:12px;
+           letter-spacing:.08em;
+           text-transform:uppercase;
+           color:rgba(0,0,0,.28);
+           background:rgba(255,255,255,.35);
+           border:1px solid rgba(0,0,0,.08);
+           border-radius:10px;
+           padding:6px 10px;
+           backdrop-filter:saturate(120%) blur(2px);
+         ">
+      ISNF / UFF
+    </div>
   </div>
 `;
+
 
 const toothSel = document.getElementById("tooth") as HTMLSelectElement;
 const varSel = document.getElementById("var") as HTMLSelectElement;
@@ -64,6 +70,7 @@ const CANDIDATES = [
   41, 42, 43, 44, 45, 46, 47,
 ];
 
+// IMPORTANTÍSSIMO p/ GitHub Pages: usar caminho RELATIVO ("models/...") e não "/models/..."
 async function fileExists(url: string) {
   try {
     const r2 = await fetch(url, { method: "GET" });
@@ -203,7 +210,7 @@ function fitCameraToObject(object: THREE.Object3D) {
 async function loadModel() {
   const tooth = toothSel.value;
   const v = varSel.value;
-  const url = `models/${tooth}/${tooth}_${v}.glb?v=${Date.now()}`;
+  const url = `models/${tooth}/${tooth}_${v}.glb`;
 
   const mySeq = ++loadSeq;
   statusEl.textContent = `Carregando ${url}...`;
@@ -220,6 +227,7 @@ async function loadModel() {
 
         current = gltf.scene;
 
+        // Ajuste de material (para GLB simples)
         current.traverse((child: any) => {
           if (child.isMesh && child.material) {
             child.material.roughness = 0.75;
@@ -241,7 +249,7 @@ async function loadModel() {
       (ev: ProgressEvent<EventTarget>) => {
         if (mySeq !== loadSeq) return;
 
-        const anyEv = ev as any; // alguns browsers preenchem loaded/total fora do typing padrão
+        const anyEv = ev as any;
         const loaded = typeof anyEv.loaded === "number" ? anyEv.loaded : 0;
         const total = typeof anyEv.total === "number" ? anyEv.total : 0;
 
