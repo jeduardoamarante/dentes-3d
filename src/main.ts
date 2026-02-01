@@ -66,8 +66,8 @@ const CANDIDATES = [
 
 async function fileExists(url: string) {
   try {
-    const r = await fetch(url, { method: "GET" });
-    return r.ok;
+    const r2 = await fetch(url, { method: "GET" });
+    return r2.ok;
   } catch {
     return false;
   }
@@ -203,7 +203,7 @@ function fitCameraToObject(object: THREE.Object3D) {
 async function loadModel() {
   const tooth = toothSel.value;
   const v = varSel.value;
-  const url = `models/${tooth}/${tooth}_${v}.glb`;
+  const url = `models/${tooth}/${tooth}_${v}.glb?v=${Date.now()}`;
 
   const mySeq = ++loadSeq;
   statusEl.textContent = `Carregando ${url}...`;
