@@ -11,6 +11,43 @@ document.body.style.margin = "0";
 app.innerHTML = `
   <div style="position:fixed; inset:0; display:flex; flex-direction:column;">
     
+// ===== WATERMARK (ISNF/UFF) - diagonal no centro =====
+function ensureWatermark() {
+  // remove se já existir (evita duplicar em hot-reload)
+  const old = document.getElementById("watermark");
+  if (old) old.remove();
+
+  const wrap = document.createElement("div");
+  wrap.id = "watermark";
+  wrap.style.position = "fixed";
+  wrap.style.inset = "0";
+  wrap.style.display = "flex";
+  wrap.style.alignItems = "center";
+  wrap.style.justifyContent = "center";
+  wrap.style.pointerEvents = "none";
+  wrap.style.zIndex = "999999"; // acima do canvas
+  wrap.style.userSelect = "none";
+
+  const label = document.createElement("div");
+  label.textContent = "ISNF / UFF";
+  label.style.transform = "rotate(-30deg)";
+  label.style.fontFamily = "system-ui";
+  label.style.fontSize = "72px";
+  label.style.fontWeight = "700";
+  label.style.letterSpacing = "0.35em";
+  label.style.textTransform = "uppercase";
+  label.style.whiteSpace = "nowrap";
+
+  // MAIS visível (se antes estava “sumindo”)
+  label.style.color = "rgba(0,0,0,0.16)";
+  label.style.textShadow = "0 0 2px rgba(0,0,0,0.08)";
+
+  wrap.appendChild(label);
+  document.body.appendChild(wrap);
+}
+
+ensureWatermark();
+
     <!-- Barra superior -->
     <div style="padding:10px; display:flex; gap:8px; align-items:center;
                 background:#fff; border-bottom:1px solid #ddd; z-index:10;">
