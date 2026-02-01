@@ -8,13 +8,8 @@ com diferentes variações anatômicas, utilizando tecnologia WebGL (Three.js).
 
 O sistema foi desenvolvido com foco em:
 - Ensino de anatomia dental
-- Apoio a disciplinas clínicas e pré-clínicas
+- Apoio a disciplinas pré-clínicas
 - Visualização anatômica interativa em ambiente web
-
-## 🌐 Acesso
-O projeto está disponível publicamente em:
-
-https://jeduardoamarante.github.io/dentes-3d/
 
 ## 🏫 Instituição
 Instituto de Saúde de Nova Friburgo – ISNF  
@@ -26,4 +21,4 @@ Universidade Federal Fluminense – UFF
 - Os modelos 3D são carregados sob demanda via web
 
 ## 👨‍🏫 Autor
-Prof. Dr. José Eduardo Vasconcellos Amarante
+Prof. Dr. José Eduardo Amarante
