@@ -66,7 +66,7 @@ const CANDIDATES = [
 
 async function fileExists(url: string) {
   try {
-    const r = await fetch(url, { method: "HEAD" });
+    const r = await fetch(url, { method: "GET" });
     return r.ok;
   } catch {
     return false;
@@ -92,7 +92,7 @@ async function populateVariantsForTooth(tooth: string) {
 
   for (let i = 1; i <= 12; i++) {
     const v = `v${String(i).padStart(2, "0")}`;
-    const url = `/models/${tooth}/${tooth}_${v}.glb`;
+    const url = `models/${tooth}/${tooth}_${v}.glb`;
 
     if (await fileExists(url)) {
       const opt = document.createElement("option");
