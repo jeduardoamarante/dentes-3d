@@ -39,7 +39,7 @@ function ensureWatermark() {
   label.style.whiteSpace = "nowrap";
 
   // MAIS visível (se antes estava “sumindo”)
-  label.style.color = "rgba(0,0,0,0.16)";
+  label.style.color = "rgba(255,0,0,0.35)";
   label.style.textShadow = "0 0 2px rgba(0,0,0,0.08)";
 
   wrap.appendChild(label);
