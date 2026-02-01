@@ -10,35 +10,60 @@ document.body.style.margin = "0";
 
 app.innerHTML = `
   <div style="position:fixed; inset:0; display:flex; flex-direction:column;">
-    <div style="padding:10px; display:flex; gap:8px; align-items:center; background:#fff; border-bottom:1px solid #ddd;">
-      ...
+    
+    <!-- Barra superior -->
+    <div style="padding:10px; display:flex; gap:8px; align-items:center;
+                background:#fff; border-bottom:1px solid #ddd; z-index:10;">
+      <button id="toothPrev">«</button>
+      <label style="font-family:system-ui;">Dente (FDI):</label>
+      <select id="tooth"></select>
+      <button id="toothNext">»</button>
+
+      <label style="font-family:system-ui;">Variação:</label>
+      <select id="var"></select>
+
+      <button id="prev">◀</button>
+      <button id="next">▶</button>
+      <button id="reset">Reset</button>
+      <button id="rotate">Auto</button>
+
+      <span id="status"
+            style="margin-left:auto; font-family:system-ui; font-size:12px;">
+      </span>
     </div>
 
+    <!-- Área do Three.js -->
     <div id="view" style="flex:1; min-height:0;"></div>
 
-    <!-- Marca d’água FIXA (sempre visível) -->
+    <!-- 🔒 MARCA D’ÁGUA DIAGONAL CENTRAL -->
     <div id="watermark"
          style="
            position:fixed;
-           right:12px;
-           bottom:10px;
-           z-index:9999;
+           inset:0;
+           display:flex;
+           align-items:center;
+           justify-content:center;
            pointer-events:none;
-           font-family:system-ui;
-           font-size:12px;
-           letter-spacing:.08em;
-           text-transform:uppercase;
-           color:rgba(0,0,0,.28);
-           background:rgba(255,255,255,.35);
-           border:1px solid rgba(0,0,0,.08);
-           border-radius:10px;
-           padding:6px 10px;
-           backdrop-filter:saturate(120%) blur(2px);
+           z-index:9999;
          ">
-      ISNF / UFF
+      <div style="
+           transform:rotate(-30deg);
+           font-family:system-ui;
+           font-size:64px;
+           font-weight:600;
+           letter-spacing:0.35em;
+           text-transform:uppercase;
+           color:rgba(0,0,0,0.08);
+           user-select:none;
+           white-space:nowrap;
+         ">
+        ISNF / UFF
+      </div>
     </div>
+
   </div>
 `;
+
 
 
 const toothSel = document.getElementById("tooth") as HTMLSelectElement;
