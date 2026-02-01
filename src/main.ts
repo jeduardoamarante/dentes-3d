@@ -77,7 +77,7 @@ async function populateTeeth() {
   toothSel.innerHTML = "";
 
   for (const t of CANDIDATES) {
-    const testUrl = `/models/${t}/${t}_v01.glb`;
+    const testUrl = `models/${t}/${t}_v01.glb`;
     if (await fileExists(testUrl)) {
       const opt = document.createElement("option");
       opt.value = String(t);
