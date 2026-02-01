@@ -203,7 +203,7 @@ function fitCameraToObject(object: THREE.Object3D) {
 async function loadModel() {
   const tooth = toothSel.value;
   const v = varSel.value;
-  const url = `/models/${tooth}/${tooth}_${v}.glb`;
+  const url = `models/${tooth}/${tooth}_${v}.glb`;
 
   const mySeq = ++loadSeq;
   statusEl.textContent = `Carregando ${url}...`;
