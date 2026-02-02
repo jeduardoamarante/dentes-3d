@@ -41,6 +41,7 @@ app.innerHTML = `
 
 /* =====================
    WATERMARK ISNF / UFF
+   (mais transparente)
 ===================== */
 function ensureWatermark() {
   const old = document.getElementById("watermark");
@@ -66,8 +67,8 @@ function ensureWatermark() {
   label.style.letterSpacing = "0.35em";
   label.style.textTransform = "uppercase";
   label.style.whiteSpace = "nowrap";
-  label.style.color = "rgba(0,0,0,0.12)";
-  label.style.textShadow = "0 2px 6px rgba(0,0,0,0.12)";
+  label.style.color = "rgba(0,0,0,0.06)"; // <<< MAIS TRANSPARENTE
+  label.style.textShadow = "none";        // <<< tira sombra (escurece muito)
 
   wrap.appendChild(label);
   document.body.appendChild(wrap);
@@ -108,9 +109,10 @@ const CANDIDATES = [
   41,42,43,44,45,46,47
 ];
 
+// GitHub Pages: caminho relativo
 async function fileExists(url: string) {
   try {
-    const r = await fetch(url);
+    const r = await fetch(url, { method: "GET" });
     return r.ok;
   } catch {
     return false;
@@ -140,6 +142,13 @@ async function populateVariantsForTooth(tooth: string) {
       varSel.appendChild(opt);
     }
   }
+  // fallback
+  if (varSel.options.length === 0) {
+    const opt = document.createElement("option");
+    opt.value = "v01";
+    opt.textContent = "V01";
+    varSel.appendChild(opt);
+  }
 }
 
 /* =====================
@@ -147,6 +156,7 @@ async function populateVariantsForTooth(tooth: string) {
 ===================== */
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.domElement.style.display = "block";
 view.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
@@ -156,82 +166,186 @@ const modelGroup = new THREE.Group();
 scene.add(modelGroup);
 
 const camera = new THREE.PerspectiveCamera(45, 1, 0.01, 1000);
-camera.position.set(0,0,2.5);
+camera.position.set(0, 0, 2.5);
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+controls.enablePan = true;
+controls.screenSpacePanning = true;
+controls.touches = { ONE: THREE.TOUCH.ROTATE, TWO: THREE.TOUCH.DOLLY_PAN };
 
-scene.add(new THREE.HemisphereLight(0xffffff,0x666666,1));
-const dir = new THREE.DirectionalLight(0xffffff,1.2);
-dir.position.set(3,5,4);
+scene.add(new THREE.HemisphereLight(0xffffff, 0x666666, 1.0));
+
+const dir = new THREE.DirectionalLight(0xffffff, 1.2);
+dir.position.set(3, 5, 4);
 scene.add(dir);
+
+const rim = new THREE.DirectionalLight(0xffffff, 0.18);
+rim.position.set(0, 2, -5);
+scene.add(rim);
+
+const fill = new THREE.DirectionalLight(0xffffff, 0.8);
+fill.position.set(-3, 2, -4);
+scene.add(fill);
 
 const loader = new GLTFLoader();
 let current: THREE.Object3D | null = null;
+let loadSeq = 0;
 
 function resize() {
   const w = view.clientWidth;
   const h = view.clientHeight;
   if (!w || !h) return;
-  renderer.setSize(w,h);
-  camera.aspect = w/h;
+  renderer.setSize(w, h);
+  camera.aspect = w / h;
   camera.updateProjectionMatrix();
+  controls.update();
 }
 window.addEventListener("resize", resize);
 
-function clearModel() {
-  modelGroup.clear();
+function disposeObject(obj: THREE.Object3D) {
+  obj.traverse((child: any) => {
+    if (child.geometry) child.geometry.dispose?.();
+    if (child.material) {
+      const m = child.material;
+      if (Array.isArray(m)) m.forEach((x) => x.dispose?.());
+      else m.dispose?.();
+    }
+  });
+}
+
+function clearModelGroup() {
+  while (modelGroup.children.length > 0) {
+    const obj = modelGroup.children[0];
+    modelGroup.remove(obj);
+    disposeObject(obj);
+  }
+}
+
+function fitCameraToObject(object: THREE.Object3D) {
+  const box = new THREE.Box3().setFromObject(object);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const fov = THREE.MathUtils.degToRad(camera.fov);
+  let cameraZ = Math.abs(maxDim / 2 / Math.tan(fov / 2));
+  cameraZ *= 1.6;
+
+  camera.position.set(center.x, center.y, center.z + cameraZ);
+  camera.near = cameraZ / 100;
+  camera.far = cameraZ * 100;
+  camera.updateProjectionMatrix();
+  camera.lookAt(center);
+
+  controls.target.copy(center);
+  controls.update();
 }
 
 async function loadModel() {
-  const url = `models/${toothSel.value}/${toothSel.value}_${varSel.value}.glb`;
-  statusEl.textContent = `Carregando ${url}`;
+  const tooth = toothSel.value;
+  const v = varSel.value;
+  const url = `models/${tooth}/${tooth}_${v}.glb`;
+
+  const mySeq = ++loadSeq;
+  statusEl.textContent = `Carregando ${url}...`;
   setProgress(0);
 
-  clearModel();
+  clearModelGroup();
+  current = null;
 
-  loader.load(
-    url,
-    (gltf: GLTF) => {
-      current = gltf.scene;
-      modelGroup.add(current);
-      resize();
-      setProgress(1);
-      statusEl.textContent = "OK";
-    },
-    e => {
-      if ((e as any).total)
-        setProgress((e as any).loaded / (e as any).total);
-    },
-    () => statusEl.textContent = "Erro ao carregar"
-  );
+  return new Promise<void>((resolve, reject) => {
+    loader.load(
+      url,
+      (gltf: GLTF) => {
+        if (mySeq !== loadSeq) return;
+
+        current = gltf.scene;
+
+        current.traverse((child: any) => {
+          if (child.isMesh && child.material) {
+            child.material.roughness = 0.75;
+            child.material.metalness = 0.0;
+          }
+        });
+
+        modelGroup.add(current);
+
+        requestAnimationFrame(() => {
+          resize();
+          fitCameraToObject(current!); // <<< ESSENCIAL p/ aparecer
+          setProgress(1);
+        });
+
+        statusEl.textContent = `OK: ${tooth} ${v.toUpperCase()}`;
+        resolve();
+      },
+      (ev: ProgressEvent<EventTarget>) => {
+        if (mySeq !== loadSeq) return;
+        const anyEv = ev as any;
+        const loaded = typeof anyEv.loaded === "number" ? anyEv.loaded : 0;
+        const total = typeof anyEv.total === "number" ? anyEv.total : 0;
+        if (total > 0) setProgress(loaded / total);
+      },
+      (err: unknown) => {
+        if (mySeq !== loadSeq) return;
+        setProgress(0);
+        statusEl.textContent = `Não achei: ${url}`;
+        reject(err);
+      }
+    );
+  });
 }
 
 /* =====================
    UI EVENTS
 ===================== */
-prevBtn.onclick = () => { varSel.selectedIndex--; loadModel(); };
-nextBtn.onclick = () => { varSel.selectedIndex++; loadModel(); };
-resetBtn.onclick = resize;
-rotateBtn.onclick = () => controls.autoRotate = !controls.autoRotate;
+function stepVariant(delta: number) {
+  const n = varSel.options.length;
+  if (n <= 1) return;
+  varSel.selectedIndex = (varSel.selectedIndex + delta + n) % n;
+  loadModel().catch(() => {});
+}
+
+async function stepTooth(delta: number) {
+  const n = toothSel.options.length;
+  if (n <= 1) return;
+  toothSel.selectedIndex = (toothSel.selectedIndex + delta + n) % n;
+  await populateVariantsForTooth(toothSel.value);
+  loadModel().catch(() => {});
+}
+
+prevBtn.onclick = () => stepVariant(-1);
+nextBtn.onclick = () => stepVariant(+1);
+
+resetBtn.onclick = () => {
+  resize();
+  if (current) fitCameraToObject(current);
+};
+
+rotateBtn.onclick = () => {
+  controls.autoRotate = !controls.autoRotate;
+  rotateBtn.textContent = controls.autoRotate ? "Auto: ON" : "Auto";
+};
+
+toothPrevBtn.onclick = () => stepTooth(-1);
+toothNextBtn.onclick = () => stepTooth(+1);
 
 toothSel.onchange = async () => {
   await populateVariantsForTooth(toothSel.value);
-  loadModel();
+  loadModel().catch(() => {});
 };
-varSel.onchange = loadModel;
+varSel.onchange = () => loadModel().catch(() => {});
 
 /* =====================
-   BOOT
+   BOOT + LOOP
 ===================== */
 await populateTeeth();
 await populateVariantsForTooth(toothSel.value);
-resize();
-loadModel();
 
-/* =====================
-   LOOP
-===================== */
+resize();
+loadModel().catch(() => {});
+
 function animate() {
   controls.update();
   renderer.render(scene, camera);
