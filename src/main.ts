@@ -10,10 +10,28 @@ document.body.style.margin = "0";
 
 app.innerHTML = `
   <div style="position:fixed; inset:0; display:flex; flex-direction:column;">
-    
-// ===== WATERMARK (ISNF/UFF) - diagonal no centro =====
+    <div style="padding:10px; display:flex; gap:8px; align-items:center; background:#fff; border-bottom:1px solid #ddd;">
+      <button id="toothPrev">«</button>
+      <label>Dente (FDI):</label>
+      <select id="tooth"></select>
+      <button id="toothNext">»</button>
+
+      <label>Variação:</label>
+      <select id="var"></select>
+
+      <button id="prev">◀</button>
+      <button id="next">▶</button>
+      <button id="reset">Reset</button>
+      <button id="rotate">Auto</button>
+
+      <span id="status" style="margin-left:auto;font-size:12px;"></span>
+    </div>
+    <div id="view" style="flex:1; min-height:0;"></div>
+  </div>
+`;
+
+// ===== WATERMARK (ISNF/UFF) — diagonal central =====
 function ensureWatermark() {
-  // remove se já existir (evita duplicar em hot-reload)
   const old = document.getElementById("watermark");
   if (old) old.remove();
 
@@ -25,7 +43,7 @@ function ensureWatermark() {
   wrap.style.alignItems = "center";
   wrap.style.justifyContent = "center";
   wrap.style.pointerEvents = "none";
-  wrap.style.zIndex = "999999"; // acima do canvas
+  wrap.style.zIndex = "999999";
   wrap.style.userSelect = "none";
 
   const label = document.createElement("div");
@@ -37,69 +55,13 @@ function ensureWatermark() {
   label.style.letterSpacing = "0.35em";
   label.style.textTransform = "uppercase";
   label.style.whiteSpace = "nowrap";
-
-  // MAIS visível (se antes estava “sumindo”)
-  label.style.color = "rgba(255,0,0,0.35)";
-  label.style.textShadow = "0 0 2px rgba(0,0,0,0.08)";
+  label.style.color = "rgba(0,0,0,0.12)";
+  label.style.textShadow = "0 2px 6px rgba(0,0,0,0.12)";
 
   wrap.appendChild(label);
   document.body.appendChild(wrap);
 }
-
 ensureWatermark();
-
-    <!-- Barra superior -->
-    <div style="padding:10px; display:flex; gap:8px; align-items:center;
-                background:#fff; border-bottom:1px solid #ddd; z-index:10;">
-      <button id="toothPrev">«</button>
-      <label style="font-family:system-ui;">Dente (FDI):</label>
-      <select id="tooth"></select>
-      <button id="toothNext">»</button>
-
-      <label style="font-family:system-ui;">Variação:</label>
-      <select id="var"></select>
-
-      <button id="prev">◀</button>
-      <button id="next">▶</button>
-      <button id="reset">Reset</button>
-      <button id="rotate">Auto</button>
-
-      <span id="status"
-            style="margin-left:auto; font-family:system-ui; font-size:12px;">
-      </span>
-    </div>
-
-    <!-- Área do Three.js -->
-    <div id="view" style="flex:1; min-height:0;"></div>
-
-    <!-- 🔒 MARCA D’ÁGUA DIAGONAL CENTRAL -->
-    <div id="watermark"
-         style="
-           position:fixed;
-           inset:0;
-           display:flex;
-           align-items:center;
-           justify-content:center;
-           pointer-events:none;
-           z-index:9999;
-         ">
-      <div style="
-           transform:rotate(-30deg);
-           font-family:system-ui;
-           font-size:64px;
-           font-weight:600;
-           letter-spacing:0.35em;
-           text-transform:uppercase;
-           color:rgba(0,0,0,0.08);
-           user-select:none;
-           white-space:nowrap;
-         ">
-        ISNF / UFF
-      </div>
-    </div>
-
-  </div>
-`;
 
 
 
