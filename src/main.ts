@@ -62,12 +62,12 @@ function ensureWatermark() {
   label.textContent = "ISNF / UFF";
   label.style.transform = "rotate(-30deg)";
   label.style.fontFamily = "system-ui";
-  label.style.fontSize = "72px";
+  label.style.fontSize = "48px";
   label.style.fontWeight = "700";
   label.style.letterSpacing = "0.35em";
   label.style.textTransform = "uppercase";
   label.style.whiteSpace = "nowrap";
-  label.style.color = "rgba(0,0,0,0.06)"; // <<< MAIS TRANSPARENTE
+  label.style.color = "rgba(0,0,0,0.04)"; // <<< MAIS TRANSPARENTE
   label.style.textShadow = "none";        // <<< tira sombra (escurece muito)
 
   wrap.appendChild(label);
