@@ -67,7 +67,7 @@ function ensureWatermark() {
   label.style.letterSpacing = "0.35em";
   label.style.textTransform = "uppercase";
   label.style.whiteSpace = "nowrap";
-  label.style.color = "rgba(0,0,0,0.04)"; // <<< MAIS TRANSPARENTE
+  label.style.color = "rgba(0,0,0,0.06)"; // <<< MAIS TRANSPARENTE
   label.style.textShadow = "none";        // <<< tira sombra (escurece muito)
 
   wrap.appendChild(label);
