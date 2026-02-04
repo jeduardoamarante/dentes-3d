@@ -1,25 +1,18 @@
 {
-    "name": "Anatomia Dental 3D – ISNF/UFF",
+    "name": "Anatomia Dental 3D | ISNF/UFF",
     "short_name": "Dental 3D",
-    "description": "Visualizador 3D de dentes – ISNF/UFF",
-    "start_url": "/dentes-3d/",
-    "scope": "/dentes-3d/",
+    "description": "Visualizador 3D de dentes | ISNF/UFF",
+    "start_url": "./",
+    "scope": "./",
     "display": "standalone",
     "background_color": "#e2e2e2",
     "theme_color": "#ffffff",
     "orientation": "any",
     "icons": [
-      {
-        "src": "/dentes-3d/icons/icon-192.png",
-        "sizes": "192x192",
-        "type": "image/png"
-      },
-      {
-        "src": "/dentes-3d/icons/icon-512.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
+      { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+      { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
     ]
   }
+  
   
   
