@@ -5,15 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Dentes 3D – ISNF/UFF</title>
 
-    <!-- PWA -->
-    <link rel="manifest" href="/manifest.json" />
-    <meta name="theme-color" content="#ffffff" />
-
-    <!-- Google Analytics (GA4) -->
+    <!-- Google tag (gtag.js) - GA4 -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-D9YLZD0BXZ"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){ window.dataLayer.push(arguments); }
+      function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
       gtag('config', 'G-D9YLZD0BXZ', { anonymize_ip: true });
     </script>
@@ -21,6 +17,7 @@
 
   <body>
     <div id="app"></div>
+    <!-- Vite entry (no build ele substitui automaticamente) -->
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
